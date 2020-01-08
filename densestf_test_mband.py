@@ -47,13 +47,12 @@ lr1 -= meanlr
 lr2 -= meanlr
 lr3 -= meanlr
 
-
 test = np.dstack([hr1, lr1, lr2])
+size_in_channels = test.shape[-1]
 
-size_in_channels = train1.shape[-1]
 
-
-def gen_test():    
+def gen_test():
+    row = epoch
     result = np.zeros([batch_size, size_input, size_input, size_in_channels], dtype=np.float32)
     label = np.zeros([batch_size, size_label, size_label, size_out_channels], dtype=np.float32)
     r = rcstart + row
@@ -114,7 +113,6 @@ with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) as sess:
     else:
         print('Failed to load checkpoint.')
     # test
-    total_loss = 0
     for epoch in range(num_epoch):
         epoch_images, epoch_labels = gen_test()
         epoch_pred, epoch_loss = sess.run([model, l2_loss],
@@ -126,10 +124,9 @@ with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) as sess:
         for idx in range(0, batch_size):
             c = idx * size_label
             pred[r:r + size_label, c:c + size_label, :] = epoch_pred[idx, :, :, :]
-        total_loss += epoch_loss
         print('Epoch:', epoch + 1, 'loss:', epoch_loss, 'duration:', time.time() - start_time)
-    total_loss /= epoch
+
     pred += meanhr
     pred *= scale
-    io.savemat('pred-{}-mband.mat'.format(model_name), {'pred': pred})
-    print('test complete! total_loss:', total_loss)
+    io.savemat('pred-{}.mat'.format(model_name), {'pred': pred})
+    print('test complete!')

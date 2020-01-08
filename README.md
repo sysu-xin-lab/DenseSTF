@@ -9,17 +9,15 @@ The pre-processing of cloudmask and gapfilling has been conducted in MATLAB. Sur
 Orginal images in the "data.mat" have a size of 1000x1000. A subset of 500x500 was used for train and test, i.e, data[250:750,250:750,:]
 
 Train :
-python densestf_train_mband.py && python densestf_train_mband_lulc.py
+  python densestf_train_mband.py && python densestf_train_mband_lulc.py
 
 Test :
-python densestf_test_mband.py && python densestf_test_mband_lulc.py
+  python densestf_test_mband.py && python densestf_test_mband_lulc.py
 
 Evaluation using MATLAB:
 
-load('data.mat','hr2')
-
-load('pred-densestf.mat','pred')
-
-Metrics = computeMetric(hr2[251:750,251:750,:],pred); % matlab index starts from 1
+  load('data.mat','hr2')
+  load('pred-densestf.mat','pred')
+  Metrics = computeMetric(hr2[251:750,251:750,:],pred); % matlab index starts from 1
 
 

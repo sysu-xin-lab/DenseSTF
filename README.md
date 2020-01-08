@@ -2,7 +2,7 @@
 
 DenseSTF impelemented by TensorFlow 1.14 
 
-Attached file namely "data.mat" shows the high resolution landsat(hr1~hr3) and low resolution MODIS(lr1~lr3) images for cropland scene.
+Attached file namely "data.mat" shows the high resolution landsat(hr1,hr2,hr3) and low resolution MODIS(lr1,lr2,lr3) images for cropland scene.
 
 The pre-processing of cloudmask and gapfilling has been conducted in MATLAB. Surface reflectence for all images are ranging 0~0.6.
 
@@ -15,8 +15,11 @@ Test :
 python densestf_test_mband.py && python densestf_test_mband_lulc.py
 
 Evaluation using MATLAB:
+
 load('data.mat','hr2')
+
 load('pred-densestf.mat')
+
 Metrics = computeMetric(hr2[251:750,251:750,:],predData); % matlab index starts from 1
 
 

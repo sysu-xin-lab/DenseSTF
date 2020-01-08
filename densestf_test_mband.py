@@ -47,20 +47,13 @@ lr1 -= meanlr
 lr2 -= meanlr
 lr3 -= meanlr
 
-train1 = np.dstack([hr1, lr1, lr3])
-train2 = np.dstack([hr3, lr3, lr1])
-test1 = np.dstack([hr1, lr1, lr2])
-test2 = np.dstack([hr3, lr3, lr2])
+
+test = np.dstack([hr1, lr1, lr2])
+
 size_in_channels = train1.shape[-1]
 
 
-def gen_test():
-    if epoch < num_epoch:
-        row = epoch
-        test = test1
-    else:
-        row = epoch - num_epoch
-        test = test2
+def gen_test():    
     result = np.zeros([batch_size, size_input, size_input, size_in_channels], dtype=np.float32)
     label = np.zeros([batch_size, size_label, size_label, size_out_channels], dtype=np.float32)
     r = rcstart + row
@@ -106,7 +99,7 @@ test_labels = tf.placeholder(tf.float32, [None, size_label, size_label, size_out
                              name='test_labels')
 model = densestfConfig.model(test_images)
 
-pred = np.zeros([size_label * batch_size * 2, size_label * batch_size, size_out_channels])
+pred = np.zeros([size_label * batch_size, size_label * batch_size, size_out_channels])
 
 l2_loss = tf.losses.mean_squared_error(labels=model, predictions=test_labels)
 
@@ -122,7 +115,7 @@ with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) as sess:
         print('Failed to load checkpoint.')
     # test
     total_loss = 0
-    for epoch in range(num_epoch * 2):
+    for epoch in range(num_epoch):
         epoch_images, epoch_labels = gen_test()
         epoch_pred, epoch_loss = sess.run([model, l2_loss],
                                           feed_dict={

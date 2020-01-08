@@ -49,20 +49,13 @@ lr1 -= meanlr
 lr2 -= meanlr
 lr3 -= meanlr
 
-train1 = np.dstack([hr1, lr1, lr3, lulc])
-train2 = np.dstack([hr3, lr3, lr1, lulc])
-test1 = np.dstack([hr1, lr1, lr2, lulc])
-test2 = np.dstack([hr3, lr3, lr2, lulc])
-size_in_channels = train1.shape[-1]
+
+test = np.dstack([hr1, lr1, lr2, lulc])
+size_in_channels = test.shape[-1]
 
 
-def gen_test():
-    if epoch < num_epoch:
-        row = epoch
-        test = test1
-    else:
-        row = epoch - num_epoch
-        test = test2
+def gen_test():    
+    row = epoch    
     result = np.zeros([batch_size, size_input, size_input, size_in_channels], dtype=np.float32)
     label = np.zeros([batch_size, size_label, size_label, size_out_channels], dtype=np.float32)
     r = rcstart + row
@@ -108,7 +101,7 @@ test_labels = tf.placeholder(tf.float32, [None, size_label, size_label, size_out
                              name='test_labels')
 model = densestfConfig.model(test_images)
 
-pred = np.zeros([size_label * batch_size * 2, size_label * batch_size, size_out_channels])
+pred = np.zeros([size_label * batch_size, size_label * batch_size, size_out_channels])
 
 l2_loss = tf.losses.mean_squared_error(labels=model, predictions=test_labels)
 
@@ -122,9 +115,8 @@ with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) as sess:
         print('Successfully loaded checkpoint.')
     else:
         print('Failed to load checkpoint.')
-    # test
-    total_loss = 0
-    for epoch in range(num_epoch * 2):
+    # test    
+    for epoch in range(num_epoch):
         epoch_images, epoch_labels = gen_test()
         epoch_pred, epoch_loss = sess.run([model, l2_loss],
                                           feed_dict={
@@ -134,11 +126,9 @@ with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) as sess:
         r = epoch * size_label
         for idx in range(0, batch_size):
             c = idx * size_label
-            pred[r:r + size_label, c:c + size_label, :] = epoch_pred[idx, :, :, :]
-        total_loss += epoch_loss
-        print('Epoch:', epoch + 1, 'loss:', epoch_loss, 'duration:', time.time() - start_time)
-    total_loss /= epoch
+            pred[r:r + size_label, c:c + size_label, :] = epoch_pred[idx, :, :, :]        
+        print('Epoch:', epoch + 1, 'loss:', epoch_loss, 'duration:', time.time() - start_time)    
     pred += meanhr
     pred *= scale
-    io.savemat('pred-{}-mband-lulc.mat'.format(model_name), {'pred': pred})
-    print('test complete! total_loss:', total_loss)
+    io.savemat('pred-{}-lulc.mat'.format(model_name), {'pred': pred})
+    print('test complete!')

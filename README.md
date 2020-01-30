@@ -10,11 +10,11 @@ Orginal images in the "data.mat" have a size of 1000x1000. A subset of 500x500 w
 
 Train:
 
-    python densestf_train_mband.py && python densestf_train_mband_lulc.py
+    python densestf_train_mband.py & python densestf_train_mband_lulc.py
 
 Test:
 
-    python densestf_test_mband.py && python densestf_test_mband_lulc.py
+    python densestf_test_mband.py & python densestf_test_mband_lulc.py
 
 Evaluation using MATLAB:
 
